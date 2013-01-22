@@ -26,7 +26,12 @@ public class SSHClient
 	private static String ENTER_CHARACTER = "\r";
 	private static final int SSH_PORT = 22;
 	private List<String> lstCmds = new ArrayList<String>();
-	private static String[] linuxPromptRegEx = new String[]{"/home/sshtest#","$", "~$","Password:"};
+	private static String[] linuxPromptRegEx = new String[]{"/home/sshtest#",
+		"$", "~$","Password:",
+		"[sudo] password for sshtest:",
+		"Do you want to continue [Y/n]?"
+		};
+	
 	private static String rootPassword = "kush.1dilip";
 	
 	private Expect4j expect = null;
@@ -75,19 +80,20 @@ public class SSHClient
 			
 			boolean isSuccess = true;
 			for(String strCmd : lstCmds) {
-				isSuccess = isSuccess(lstPattern,strCmd);
+				isSuccess = isSuccess(lstPattern,strCmd,2000);
 				if (!isSuccess) {
-					isSuccess = isSuccess(lstPattern,strCmd);
+					isSuccess = isSuccess(lstPattern,strCmd,2000);
 				}
 			}
 			
-//			Thread.sleep(2*1000);
+			//root login
+			System.out.println("root login:" + isSuccess(lstPattern, "su root",2000));
+			System.out.println(isSuccess(lstPattern, rootPassword,2000));
+
+			//installing synaptic
+			System.out.println("synaptic install :" + isSuccess(lstPattern,"sudo apt-get install bluefish",2000));
+			System.out.println(isSuccess(lstPattern,"Y",12000));
 			
-//			checkResult(expect.expect(lstPattern));
-			
-			System.out.println(isSuccess(lstPattern, "su root"));
-			System.out.println(isSuccess(lstPattern, rootPassword));
-//			Thread.sleep(5*1000);
 			checkResult(expect.expect(lstPattern));
 			
 			
@@ -106,14 +112,14 @@ public class SSHClient
 	 * @param strCommandPattern
 	 * @return
 	 */
-	private boolean isSuccess(List<Match> objPattern,String strCommandPattern) {
+	private boolean isSuccess(List<Match> objPattern,String strCommandPattern,int sleepTime) {
 		try {
 			boolean isFailed = checkResult(expect.expect(objPattern));
 			
 			if (!isFailed) {
 				expect.send(strCommandPattern);
 				expect.send(ENTER_CHARACTER);
-				Thread.sleep(5000);
+				Thread.sleep(sleepTime);
 				return true;
 			}
 			return false;
