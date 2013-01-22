@@ -24,18 +24,7 @@
 		<dependency>
 			<groupId>com.jcraft</groupId>
 			<artifactId>jsch</artifactId>
-			<version>0.1.49</version>
+			<version>0.1.48</version>
 		</dependency>
-		<dependency>
-			<groupId>net.sourceforge.expectj</groupId>
-			<artifactId>expectj</artifactId>
-			<version>2.0.1</version>
-		</dependency>
-		<dependency>
-			<groupId>ant</groupId>
-			<artifactId>ant-jakarta-oro</artifactId>
-			<version>1.6.1</version>
-		</dependency>
-
 	</dependencies>
 </project>

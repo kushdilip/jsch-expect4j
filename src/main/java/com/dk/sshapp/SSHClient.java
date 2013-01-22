@@ -26,8 +26,9 @@ public class SSHClient
 	private static String ENTER_CHARACTER = "\r";
 	private static final int SSH_PORT = 22;
 	private List<String> lstCmds = new ArrayList<String>();
-	private static String[] linuxPromptRegEx = new String[]{"\\>","$", "~$"};
-
+	private static String[] linuxPromptRegEx = new String[]{"/home/sshtest#","$", "~$","Password:"};
+	private static String rootPassword = "kush.1dilip";
+	
 	private Expect4j expect = null;
 	private StringBuilder buffer = new StringBuilder();
 	private String userName;
@@ -67,7 +68,6 @@ public class SSHClient
 			}
 		}
 
-		System.out.println(lstPattern);
 		
 		try {
 			
@@ -80,8 +80,17 @@ public class SSHClient
 					isSuccess = isSuccess(lstPattern,strCmd);
 				}
 			}
-
+			
+//			Thread.sleep(2*1000);
+			
+//			checkResult(expect.expect(lstPattern));
+			
+			System.out.println(isSuccess(lstPattern, "su root"));
+			System.out.println(isSuccess(lstPattern, rootPassword));
+//			Thread.sleep(5*1000);
 			checkResult(expect.expect(lstPattern));
+			
+			
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		} finally {
@@ -100,10 +109,11 @@ public class SSHClient
 	private boolean isSuccess(List<Match> objPattern,String strCommandPattern) {
 		try {
 			boolean isFailed = checkResult(expect.expect(objPattern));
-
+			
 			if (!isFailed) {
 				expect.send(strCommandPattern);
 				expect.send(ENTER_CHARACTER);
+				Thread.sleep(5000);
 				return true;
 			}
 			return false;
@@ -125,8 +135,6 @@ public class SSHClient
 	 * @throws Exception
 	 */
 	private Expect4j SSH() throws Exception {
-		System.out.println(userName + host + SSH_PORT);
-		System.out.println(lstCmds);
 		JSch jsch = new JSch();
 		Session session = jsch.getSession(userName, host, SSH_PORT);
 		if (password != null) {
@@ -172,6 +180,6 @@ public class SSHClient
 		cmdsToExecute.add("pwd");
 		cmdsToExecute.add("mkdir testdir");
 		String outputLog = ssh.execute(cmdsToExecute);
-		System.out.println(outputLog);
+		System.out.println("outputlog: " + outputLog);
 	}
 }
