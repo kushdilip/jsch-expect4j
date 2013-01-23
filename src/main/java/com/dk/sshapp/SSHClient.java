@@ -92,9 +92,13 @@ public class SSHClient
 
 			//installing synaptic
 			System.out.println("synaptic install :" + isSuccess(lstPattern,"sudo apt-get install bluefish",2000));
-			System.out.println(isSuccess(lstPattern,"Y",12000));
+//			System.out.println(isSuccess(lstPattern,"Y",12000));
+			System.out.println("exit: " + isSuccess(lstPattern, "exit",2000));
+			System.out.println("finally: " + expect.expect("~$"));
+			
 			
 			checkResult(expect.expect(lstPattern));
+			
 			
 			
 		} catch (Exception ex) {
@@ -113,13 +117,21 @@ public class SSHClient
 	 * @return
 	 */
 	private boolean isSuccess(List<Match> objPattern,String strCommandPattern,int sleepTime) {
+		sleepTime = 1000;
 		try {
 			boolean isFailed = checkResult(expect.expect(objPattern));
 			
 			if (!isFailed) {
 				expect.send(strCommandPattern);
 				expect.send(ENTER_CHARACTER);
+				
+				System.out.println("BEFORE SLEEP, " + strCommandPattern + ": " + expect.expect(objPattern));
+				
 				Thread.sleep(sleepTime);
+				
+				
+				
+				
 				return true;
 			}
 			return false;
@@ -154,6 +166,7 @@ public class SSHClient
 		ChannelShell channel = (ChannelShell) session.openChannel("shell");
 		Expect4j expect = new Expect4j(channel.getInputStream(), channel.getOutputStream());
 		channel.connect();
+		expect.setDefaultTimeout(Expect4j.TIMEOUT_DEFAULT);
 		return expect;
 	}
 	/**
